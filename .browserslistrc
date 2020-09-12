@@ -1,3 +1,7 @@
-> 1%
-last 2 versions
-not dead
+Android >= 4.4
+iOS >= 11
+
+and_qq >= 1.2
+and_uc >= 11.8
+safari >= 12
+since 2016

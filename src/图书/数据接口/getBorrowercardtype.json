@@ -1,0 +1,108 @@
+{
+    "statusCode": 0,
+    "message": "success",
+    "data": {
+        "borrowercardtype": [
+            {
+                "id": 1,
+                "cardtype": 1,
+                "name": "年卡",
+                "desc": "借书年卡",
+                "maxpausetimes": 3,
+                "maxpausedays": 90,
+                "basepayment": 10,
+                "createdby": 1,
+                "createdate": "2017-05-03 10:29:39",
+                "validdays": 366,
+                "book_num_limit": 99,
+                "TimeUpdate": "2018-03-09 15:34:17"
+            },
+            {
+                "id": 2,
+                "cardtype": 2,
+                "name": "季卡",
+                "desc": "季度卡",
+                "maxpausetimes": 3,
+                "maxpausedays": 90,
+                "basepayment": 10,
+                "createdby": 1,
+                "createdate": "2017-05-03 10:29:56",
+                "validdays": 92,
+                "book_num_limit": 99,
+                "TimeUpdate": "2018-03-09 15:34:17"
+            },
+            {
+                "id": 3,
+                "cardtype": 3,
+                "name": "月卡",
+                "desc": "月卡",
+                "maxpausetimes": 1,
+                "maxpausedays": 10,
+                "basepayment": 10,
+                "createdby": 1,
+                "createdate": "2017-05-03 10:30:38",
+                "validdays": 31,
+                "book_num_limit": 99,
+                "TimeUpdate": "2018-03-09 15:34:18"
+            },
+            {
+                "id": 5,
+                "cardtype": 5,
+                "name": "体验卡",
+                "desc": "体验卡",
+                "maxpausetimes": 3,
+                "maxpausedays": 90,
+                "basepayment": 10,
+                "createdby": 1,
+                "createdate": "2017-07-31 13:43:26",
+                "validdays": 30,
+                "book_num_limit": 99,
+                "TimeUpdate": "2018-07-31 07:11:26"
+            },
+            {
+                "id": 6,
+                "cardtype": 6,
+                "name": "半年卡",
+                "desc": "半年卡",
+                "maxpausetimes": 3,
+                "maxpausedays": 90,
+                "basepayment": 10,
+                "createdby": 1,
+                "createdate": "2017-07-31 13:43:43",
+                "validdays": 183,
+                "book_num_limit": 99,
+                "TimeUpdate": "2018-03-09 15:34:21"
+            }
+        ],
+        "memberParent": [
+            {
+                "id": 502,
+                "title": "父亲"
+            },
+            {
+                "id": 503,
+                "title": "母亲"
+            },
+            {
+                "id": 504,
+                "title": "祖父"
+            },
+            {
+                "id": 505,
+                "title": "祖母"
+            },
+            {
+                "id": 506,
+                "title": "外祖父"
+            },
+            {
+                "id": 507,
+                "title": "外祖母"
+            },
+            {
+                "id": 521,
+                "title": "其他"
+            }
+        ]
+    }
+}

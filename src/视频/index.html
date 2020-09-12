@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <title>视频</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vant@2.6/lib/index.css">
+    <style>
+        body { font-size: 14px; line-height: 1.5; color: #666; }
+    </style>
+</head>
+<body>
+    <noscript>请启用Javascript！</noscript>
+    <div id="app"></div>
+    <% if (process.env.NODE_ENV === 'production') { %>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1/dist/vue-resource.min.js"></script>
+    <% } else if (process.env.NODE_ENV === 'development') { %>
+        <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1/dist/vue-resource.js"></script>
+    <% } %>
+    <script src="https://cdn.jsdelivr.net/npm/vant@2.6/lib/vant.min.js"></script>
+    <!-- built files will be auto injected -->
+</body>
+</html>
