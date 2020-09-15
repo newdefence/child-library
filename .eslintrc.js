@@ -9,6 +9,7 @@ module.exports = {
     ],
     globals: {
         Vue: true,
+        VueRouter: true,
         vant: true,
     },
     parserOptions: {

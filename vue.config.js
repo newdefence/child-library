@@ -10,13 +10,13 @@ const HA_CONFIG = {
 // eslint-disable-next-line no-unused-vars
 const SA_CONFIG = {
     pages: {
-        daka: { entry: 'src/SA-打卡/app.js', template: 'src/SA-打卡/index.html' },
+        rd: { entry: 'src/图书/rd/main.js', template: 'src/图书/index.html' },
     },
-    publicPath: process.env.NODE_ENV === 'production' ? '/sa/' : '',
+    publicPath: process.env.NODE_ENV === 'production' ? '' : '',
 };
 
-const CONFIG = HA_CONFIG;
-// const CONFIG = SA_CONFIG;
+// const CONFIG = HA_CONFIG;
+const CONFIG = SA_CONFIG;
 
 module.exports = {
     chainWebpack(config) {
@@ -42,6 +42,7 @@ module.exports = {
         // eslint-disable-next-line no-param-reassign
         config.externals = {
             vue: 'Vue',
+            'vue-router': 'VueRouter',
             vant: 'vant',
         };
     },

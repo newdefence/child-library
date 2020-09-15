@@ -13,6 +13,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+*.pyc
+scripts/*.xlsx
+templates
+
 # Editor directories and files
 .idea
 .vscode
