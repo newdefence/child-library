@@ -1,6 +1,9 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 
+import '@/components/VanSelect.less';
+import '@/components/VanSelect';
+
 import App from './Main.vue';
 import Books from './Books.vue';
 import Users from './Users.vue';
@@ -12,7 +15,7 @@ import Book from './Book.vue';
 const routes = [
     { path: '/', redirect: '/books' },
     { path: '/books', component: Books },
-    { path: '/book', component: Book },
+    { path: '/book/:id', component: Book, props: true },
     { path: '/users', component: Users },
     { path: '/mine', component: Mine },
 ];
