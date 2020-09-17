@@ -10,9 +10,10 @@ const HA_CONFIG = {
 // eslint-disable-next-line no-unused-vars
 const SA_CONFIG = {
     pages: {
-        rd: { entry: 'src/图书/rd/main.js', template: 'src/图书/index.html' },
+        index: { entry: 'src/图书/rd/main.js', template: 'src/图书/index.html' },
+        login: { entry: 'src/图书/rd/login.js', template: 'src/图书/index.html' },
     },
-    publicPath: process.env.NODE_ENV === 'production' ? '' : '',
+    publicPath: '/rd/',
 };
 
 // const CONFIG = HA_CONFIG;
@@ -52,7 +53,7 @@ module.exports = {
             'Access-Control-Allow-Origin': '*',
         },
         proxy: {
-            '/api': { target: 'http://test.js' },
+            '/rd': { target: 'http://localhost:9999' },
         },
     },
     pages: CONFIG.pages,

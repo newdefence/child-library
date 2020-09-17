@@ -7,8 +7,7 @@ reload(sys)
 sys.setdefaultencoding("utf8")
 
 import os
-from datetime import datetime, date
-from json import JSONEncoder
+from datetime import datetime
 
 from tornado.ioloop import IOLoop
 from tornado.log import app_log
@@ -25,15 +24,7 @@ except ImportError:
     print "please create py/config/%s.py and modify it correctly as py/config/simple.py ..." % ('local' if options.debug else 'online')
     exit()
 
-# from py import wx
-# from py.admin import activity, login
 import base
-
-class TestHandler(RequestHandler):
-    def get(self):
-        page = self.get_query_argument('page')
-        value = int(self.get_query_argument('value'))
-        self.render('wx/%s.html' % page, package={'value': value})
 
 def main():
     settings = dict(
@@ -53,11 +44,12 @@ def main():
         # (r'/activity/(\w+)/qrcode', activity.QrCodePageHandler), # 二维码图像列表页面
         # (r'/activity/(\w+)/qrcode/(\w+)', activity.QRCodeHander), # GET 单个二维码图像, id, seq, salt
         (r'/rd/login', base.LoginHandler),
+        (r'/rd/books', base.BooksHandler),
     ]
-    if options.debug:
-        handlers += [
-            (r'/test.html', TestHandler),
-        ]
+    # if options.debug:
+    #     handlers += [
+    #         (r'/test.html', TestHandler),
+    #     ]
 
 
     application = Application(handlers, **settings)
@@ -71,3 +63,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

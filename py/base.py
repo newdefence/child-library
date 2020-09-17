@@ -3,36 +3,62 @@ __author__ = 'defence.zhang@gmail.com'
 __date__ = "2020/09/14 上午9:38:00"
 
 from datetime import datetime, date
-from json import JSONEncoder
+import functools
+import json
 
 from tornado_mysql.pools import Pool
 from tornado_mysql.cursors import DictCursor
 
-from tornado.web import Application, RequestHandler
+from tornado.gen import coroutine
+from tornado.web import HTTPError, RequestHandler
 
-class JSONEncoder2(JSONEncoder):
+class JSONEncoder2(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, datetime):
             return o.strftime('%Y-%m-%d %H:%M:%S')
         elif isinstance(o, date):
             return o.strftime('%Y-%m-%d')
         else:
-            return JSONEncoder.default(self, o)
+            return json.JSONEncoder.default(self, o)
+
+def authenticated(method):
+    """Decorate methods with this to require that the user be logged in.
+
+    If the user is not logged in, they will be redirected to the configured
+    `login url <RequestHandler.get_login_url>`.
+
+    If you configure a login url with a query parameter, Tornado will
+    assume you know what you're doing and use it as-is.  If not, it
+    will add a `next` parameter so the login page knows where to send
+    you once you're logged in.
+    """
+    @functools.wraps(method)
+    def wrapper(self, *args, **kwargs):
+        if not self.current_user:
+            self.set_status(403)
+            self.finish({ 'success': False, 'message': '请登录' })
+        return method(self, *args, **kwargs)
+    return wrapper
 
 
 COOKIE_KEY = 'uid'
 JSON_ENCODER = JSONEncoder2(ensure_ascii=False)
 
 Db_Pool = Pool(dict(
-        host="localhost", user="web", passwd="qaz123", database="child_library", charset="utf8mb4",
+        host="localhost", user="web", password="qaz123", database="child_library", charset="utf8mb4",
         cursorclass=DictCursor, connect_timeout=1000
     ), max_open_connections=30)
+# 费了4个小时的时间，排除类库的一个BUG，真不值得
+# TODO: deprecate server_language and server_charset.
+# mysqlclient-python doesn't provide it.
+# self.server_charset = charset_by_id(lang).name
 
 class BaseHandler(RequestHandler):
     def get_current_user(self):
         user_id, user = self.get_secure_cookie(COOKIE_KEY), None
         if not user_id: return None
         return { 'name': '测试账户', 'id': user_id }
+
     # def check_xsrf_cookie(self):
     #     pass
 
@@ -63,13 +89,15 @@ class LoginHandler(RequestHandler):
             raise HTTPError(404)
 
     def post(self):
-        user = loads(self.request.body)
-        self.set_secure_cookie(COOKIE_KEY, user['name'])
+        user = json.loads(self.request.body)
+        self.set_secure_cookie(COOKIE_KEY, user['phone'])
         self.finish({'success': True, 'msg': '登录成功'})
 
     def put(self):
         self.clear_cookie(COOKIE_KEY)
         self.finish({'success': True, 'msg': '退出成功'})
+
+from tornado.httpclient import HTTPRequest, AsyncHTTPClient
 
 class BooksHandler(BaseHandler):
     @coroutine
@@ -79,7 +107,7 @@ class BooksHandler(BaseHandler):
         keyword, age, topic, lang = [self.get_query_argument(k, None) for k in ('keyword', 'age', 'topic', 'lang')]
         if keyword:
             where.append('(`isbn`=%s OR `code`=%s OR name LIKE %s)')
-            params.append(keyword, keyword, '%' + keyword + '%')
+            params += [keyword, keyword, '%' + keyword + '%']
         if age:
             where.append('`forAge`=%s')
             params.append(age)
@@ -94,10 +122,7 @@ class BooksHandler(BaseHandler):
         total = cursor.fetchone()['total']
         cursor = yield Db_Pool.execute('SELECT * FROM `books` %s ORDER BY created DESC;' % wheres, params)
         books = cursor.fetchall()
-        self.finish({
-            'total': total,
-            'data': books
-        })
+        self.finish({ 'success': True, 'total': total, 'data': books })
 
 class BookHandler(BaseHandler):
     @coroutine

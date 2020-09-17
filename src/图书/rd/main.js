@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 
 import '@/components/VanSelect.less';
 import '@/components/VanSelect';
+import '../ajax';
 
 import App from './Main.vue';
 import Books from './Books.vue';
