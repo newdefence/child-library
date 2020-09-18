@@ -5,10 +5,13 @@ __date__ = "2020/09/14 上午9:38:00"
 from datetime import datetime, date
 import functools
 import json
+import os
+import time
 
 from tornado_mysql.pools import Pool
 from tornado_mysql.cursors import DictCursor
 
+# from tornado.escape import json_decode
 from tornado.gen import coroutine
 from tornado.web import HTTPError, RequestHandler
 
@@ -54,6 +57,18 @@ Db_Pool = Pool(dict(
 # self.server_charset = charset_by_id(lang).name
 
 class BaseHandler(RequestHandler):
+    requestJSON = None
+    keyword = None
+    start = 0
+    size = 0
+
+    def prepare(self):
+        if self.request.headers.get("Content-Type", "").lower().find("application/json") == 0 and self.request.body:
+            self.requestJSON = json.loads(self.request.body)
+        start, size, self.keyword = [self.get_query_argument(key, None) for key in ("start", "size", "keyword")]
+        if start and start.isdigit(): self.start = int(start)
+        if size and size.isdigit(): self.size = int(size)
+
     def get_current_user(self):
         user_id, user = self.get_secure_cookie(COOKIE_KEY), None
         if not user_id: return None
@@ -97,8 +112,6 @@ class LoginHandler(RequestHandler):
         self.clear_cookie(COOKIE_KEY)
         self.finish({'success': True, 'msg': '退出成功'})
 
-from tornado.httpclient import HTTPRequest, AsyncHTTPClient
-
 class BooksHandler(BaseHandler):
     @coroutine
     @authenticated
@@ -124,21 +137,61 @@ class BooksHandler(BaseHandler):
         books = cursor.fetchall()
         self.finish({ 'success': True, 'total': total, 'data': books })
 
+UPLOAD_IMAGE_SUFFIX = {".jpg", ".png", ".jpeg", ".gif", ".bmp", ".webp"}
+UPLOAD_IMAGE_PATH = os.path.join(os.path.dirname(__file__), "../public/img/books/%s")
+class BookPhotoHandler(BaseHandler):
+    def post(self, *args, **kwargs):
+        imgName = None
+        imgFile = self.request.files['file'][0]
+        suffix = os.path.splitext(imgFile["filename"])[1]
+        if not suffix:
+            suffix = '.jpg'
+        bookIdString = self.get_body_argument('bookId', None)
+        if not bookIdString:
+            bookIdString = 'ts-%s' %time.time()
+        if suffix in UPLOAD_IMAGE_SUFFIX:
+            imgName = bookIdString + suffix
+            imgPath = UPLOAD_IMAGE_PATH % imgName
+            # 写文件的各种坑，有的时候写不上文件
+            # http://www.oschina.net/translate/reliable-file-updates-with-python
+            # http://blog.gocept.com/2013/07/15/reliable-file-updates-with-python/
+            with open(imgPath, "wb") as f:
+                f.write(imgFile["body"])
+                f.flush()
+                if hasattr(os, "fdatasync"): os.fdatasync(f.fileno())
+                else: os.fsync(f.fileno())  # windows, mac os
+        self.finish({ 'success': True, 'url': '/img/books/%s' % imgName })
+
 class BookHandler(BaseHandler):
     @coroutine
     @authenticated
     def get(self, *args, **kwargs):
-        pass
+        bookId = self.get_query_argument('id')
+        cursor = yield Db_Pool.execute('SELECT * FROM `books` WHERE `id`=%s;', (bookId, ))
+        book = cursor.fetchone()
+        self.finish({ 'success': True, 'data': book })
 
     @coroutine
     @authenticated
     def post(self, *args, **kwargs):
-        pass
+        book = self.requestJSON
+        cursor = yield Db_Pool.execute('''INSERT INTO `books`
+            (isbn,`code`, `name`, price, `status`, created, author, pubDate, photo, intro, remark, lang, tags, forAge)
+            VALUE(%s, %s, %s, %s, '在馆', NOW(), %s, %s, %s, %s, %s, %s, %s, %s);''', 
+            (book['isbn'], book['code'], book['name'], book['price'], book['author'], book['pubDate'],
+            book['photo'], book['intro'], book['remark'], book['lang'], book['tags'], book['forAge']))
+        self.finish({ 'success': True, 'id': cursor.lastrowid, 'message': '添加图书成功' })
 
     @coroutine
     @authenticated
     def put(self, *args, **kwargs):
-        pass
+        bookId, book = self.get_query_argument('id'), self.requestJSON
+        cursor = yield Db_Pool.execute('''UPDATE `books`
+        SET `name`=%s, isbn=%s, code=%s, price=%s, press=%s, author=%s, pubDate=%s, photo=%s,
+            intro=%s, remark=%s, lang=%s, tags=%s, forAge=%s
+        WHERE `id`=%s;''', (book['name'], book['isbn'], book['code'], book['price'], book['press'], book['author'], book['pubDate'], book['photo'],
+            book['intro'], book['remark'], book['lang'], book['tags'], book['forAge'], bookId))
+        self.finish({ 'success': True, 'message': '修改图书成功' })
 
     @coroutine
     @authenticated

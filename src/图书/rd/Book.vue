@@ -64,7 +64,7 @@ export default {
             // if (fileName.indexOf('.') < 0) {
             //     if (file.type) { fileName = file.type.replace('image/', ''); }
             // }
-            fd.append('fileType', file.file.type.replace('image/', ''));
+            // fd.append('fileType', file.file.type.replace('image/', ''));
             if (id) {
                 fd.append('bookId', id);
             }
