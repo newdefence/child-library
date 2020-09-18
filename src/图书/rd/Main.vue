@@ -18,7 +18,7 @@ h1 { margin: 0; font-size: 20px; line-height: 36px; text-align: center; }
         <VanIcon name="scan"/>
         <template>我要还书</template>
     </div>
-    <VanTabbar v-model="tab" route>
+    <VanTabbar v-model="tab" placeholder route>
         <VanTabbarItem name="books" to="/books" icon="home-o">馆藏</VanTabbarItem>
         <VanTabbarItem name="users" to="/users" icon="friends-o">会员</VanTabbarItem>
         <VanTabbarItem name="book" to="/book" icon="add-o">新书</VanTabbarItem>

@@ -27,12 +27,15 @@
         <VanField v-model="press" label="出版社" placeholder="请输入出版社" :rules="[{ required: true, message: '请输入出版社' }]"/>
         <VanDateSelect v-model="pubDate" label="出版日期" placeholder="请输入出版日期" :rules="[{ required: true, message: '请输入出版日期' }]"/>
         <VanField v-model="intro" type="textarea" rows="2" autosize label="图书简介" placeholder="请输入图书简介" :rules="[{ required: true, message: '请输入图书简介' }]"/>
-        <VanButton round block type="info" native-type="submit">{{ id ? '保存修改' : '上架图书' }}</VanButton>
+        <VanCell>
+            <VanButton round block type="info" native-type="submit">{{ id ? '保存修改' : '上架图书' }}</VanButton>
+        </VanCell>
     </VanForm>
 </div>
 </template>
 <script>
 import { ages, topics, langEnTypes } from '@/图书/common';
+import { ajaxLoad, ajaxPost } from '@/图书/ajax';
 
 export default {
     name: 'Book',
@@ -54,16 +57,42 @@ export default {
     methods: {
         afterRead(file) {
             console.log('TODO 上传文件：', file);
+            const { id } = this;
+            // let fileName = file.file.name;
+            const fd = new FormData();
+            fd.append('file', file);
+            // if (fileName.indexOf('.') < 0) {
+            //     if (file.type) { fileName = file.type.replace('image/', ''); }
+            // }
+            fd.append('fileType', file.file.type.replace('image/', ''));
+            if (id) {
+                fd.append('bookId', id);
+            }
+            file.status = 'uploading';
+            // eslint-disable-next-line prefer-rest-params
+            console.log(arguments);
+            Vue.http.post('/rd/book/photo', fd).then(({ body }) => {
+                file.status = 'done';
+                file.url = body.url;
+            }, () => {
+                file.status = 'failed';
+                file.message = '上传失败';
+            });
         },
         onSubmit() {
             // TODO: 保存图书
+            const vm = this;
+            ajaxPost(vm, '保存图书', Vue.http.post('/rd/book', {}), () => {
+                vm.$router.push({ path: '/rd/books' });
+            });
         },
     },
     created() {
-        if (this.id) {
-            //
+        const vm = this;
+        if (vm.id) {
+            ajaxLoad(vm, '图书信息', Vue.http.get('/rd/book', { params: { id: vm.id } }));
         } else {
-            document.title = '新书上架';
+            document.title = vm.id ? '图书修改' : '新书上架';
         }
     },
 };

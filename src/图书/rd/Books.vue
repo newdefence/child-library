@@ -3,9 +3,13 @@
     .item {
         height: 70px; padding-left: 78px;
         // background: red;
-        img { position: absolute; top: 0; left: 0; width: 70px; height: 70px; border-radius: 5px; }
-        h3 { margin: 0; font-size: 16px; }
-        .isbn { font-size: 12px; }
+        img {
+            position: absolute; top: 0; left: 0; width: 70px; height: 70px;
+            background: #eee;
+            border-radius: 5px;
+        }
+        h3 { margin: 0 0 5px; font-size: 16px; }
+        .info { font-size: 12px; line-height: 14px; }
         a {
             position: absolute; top: 23px; right: 0;
             width: 5em; height: 24px; border-radius: 12px;
@@ -29,7 +33,9 @@
             <div class="item">
                 <img :src="b.photo" alt="图书封面"/>
                 <h3>{{ b.name }}</h3>
-                <div class="isbn">ISBN: {{ b.isbn }}</div>
+                <div class="info">ISBN: {{ b.isbn }}</div>
+                <div v-if="b.author" class="info">作者: {{ b.author }}</div>
+                <div v-if="b.press" class="info">出版社: {{ b.press }}</div>
                 <a href="javascript:" :class="'status-' + b.status">借出</a>
             </div>
         </VanCell>

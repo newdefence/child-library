@@ -16,7 +16,7 @@ import Book from './Book.vue';
 const routes = [
     { path: '/', redirect: '/books' },
     { path: '/books', component: Books },
-    { path: '/book/:id', component: Book, props: true },
+    { path: '/book/:id?', component: Book, props: true },
     { path: '/users', component: Users },
     { path: '/mine', component: Mine },
 ];
